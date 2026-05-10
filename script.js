@@ -239,8 +239,7 @@ function saveConfig() {
 
 // ================= MQTT CONNECT =================
 function connectMQTT(config) {
-  // const url = `wss://${config.broker}:${config.port}/mqtt`;
-  const url = "wss://broker.emqx.io:8084/mqtt";
+  const url = `wss://${config.broker}:${config.port}/mqtt`;
   client = mqtt.connect(url);
 
   client.on("connect", () => {
