@@ -321,7 +321,8 @@ function connectMQTT(config) {
     }
   });
 
-  client.on("error", () => {
+  client.on("error", (err) => {
+    console.error("MQTT Error:", err);
     const statusEl = document.getElementById("status");
     statusEl.innerText = "Error";
     statusEl.classList.remove("badge-success");
