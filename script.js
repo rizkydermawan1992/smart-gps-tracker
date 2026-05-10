@@ -252,6 +252,7 @@ function connectMQTT(config) {
     statusEl.classList.add("badge-success");
 
     client.subscribe(config.sub_topic);
+    console.log("Connected");
   });
 
   client.on("offline", () => {
@@ -261,6 +262,7 @@ function connectMQTT(config) {
 
     statusEl.classList.remove("badge-success");
     statusEl.classList.add("badge-danger");
+    console.log("Disconnected");
   });
 
   client.on("message", (topic, message) => {
