@@ -172,8 +172,8 @@ function loadConfig() {
 
   if (!config) {
     config = {
-      broker: "broker.hivemq.com",
-      port: 8884,
+      broker: "broker.emqx.io",
+      port: 8084,
       pub_topic: "rizky/geo-alert",
       sub_topic: "esp32/rizky-sub",
     };
