@@ -240,7 +240,13 @@ function saveConfig() {
 // ================= MQTT CONNECT =================
 function connectMQTT(config) {
   const url = `wss://${config.broker}:${config.port}/mqtt`;
-  client = mqtt.connect(url);
+  // client = mqtt.connect(url);
+  client = mqtt.connect(url, {
+    clientId: "gps_" + Math.random().toString(16).slice(2, 8),
+    clean: true,
+    connectTimeout: 5000,
+    reconnectPeriod: 3000,
+  });
 
   client.on("connect", () => {
     const statusEl = document.getElementById("status");
