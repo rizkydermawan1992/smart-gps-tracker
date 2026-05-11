@@ -175,7 +175,7 @@ function loadConfig() {
       broker: "broker.emqx.io",
       port: 8084,
       pub_topic: "rizky/geo-alert",
-      sub_topic: "esp32/rizky-sub",
+      sub_topic: "rizky/gps-data",
     };
   }
 
