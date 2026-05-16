@@ -39,3 +39,84 @@ body {
   font-size: 16px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
+
+/* ================= RESPONSIVE ================= */
+
+/* Tablet (max 992px) */
+@media (max-width: 992px) {
+  #map {
+    height: 50vh;
+  }
+
+  .card-custom {
+    margin-top: 0;
+  }
+
+  .stat-box {
+    padding: 10px;
+  }
+}
+
+/* Mobile (max 576px) */
+@media (max-width: 576px) {
+  h4.text-center {
+    font-size: 16px;
+    margin-bottom: 8px !important;
+  }
+
+  #map {
+    height: 40vh;
+    border-radius: 10px;
+  }
+
+  .card-custom {
+    border-radius: 10px;
+    padding: 10px !important;
+  }
+
+  .stat-box {
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  .stat-box i {
+    font-size: 14px;
+    margin-bottom: 3px;
+  }
+
+  .stat-box div {
+    font-size: 12px;
+  }
+
+  #location {
+    font-size: 13px !important;
+  }
+
+  .btn-fab {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    top: 10px !important;
+    right: 10px !important;
+  }
+
+  /* Stack status dan switch secara vertikal di mobile */
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start !important;
+  }
+
+  /* Modal lebih compact di mobile */
+  .modal-body {
+    padding: 12px;
+  }
+
+  .modal-body .p-3 {
+    padding: 10px !important;
+  }
+
+  .form-control {
+    font-size: 14px;
+  }
+}
