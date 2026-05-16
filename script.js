@@ -17,6 +17,11 @@ map.on("click", function (e) {
   }).addTo(map);
 
   updateGeofence();
+  //Auto-save geo_center ke localStorage
+  if (currentConfig) {
+    currentConfig.geo_center = GEOFENCE_CENTER;
+    localStorage.setItem("mqtt_config", JSON.stringify(currentConfig));
+  }
 });
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -49,6 +54,9 @@ const geofenceSwitch = document.getElementById("geofenceSwitch");
 geofenceSwitch.addEventListener("change", function () {
   geofenceEnabled = this.checked;
 
+  // simpan state switch ke localStorage
+  localStorage.setItem("geofence_enabled", geofenceEnabled);
+
   console.log(geofenceEnabled ? "Geofence Enabled" : "Geofence Disabled");
 
   if (geofenceEnabled) {
@@ -66,7 +74,7 @@ var geofenceCircle = L.circle(GEOFENCE_CENTER, {
   opacity: 0.8, // transparansi garis
   fillColor: "#f20c0c",
   fillOpacity: 0.2, // transparansi isi (semi transparan)
-}).addTo(map);
+});
 
 // ================= MQTT =================
 let client = null;
@@ -166,32 +174,6 @@ function checkGeofence(lat, lon) {
   isInsideGeofence = inside;
 }
 
-// ================= CONFIG =================
-function loadConfig() {
-  let config = JSON.parse(localStorage.getItem("mqtt_config"));
-
-  if (!config) {
-    config = {
-      broker: "broker.emqx.io",
-      port: 8084,
-      pub_topic: "rizky/geo-alert",
-      sub_topic: "rizky/gps-data",
-    };
-  }
-
-  currentConfig = config;
-
-  document.getElementById("broker").value = config.broker;
-  document.getElementById("port").value = config.port;
-  document.getElementById("pub_topic").value = config.pub_topic;
-  document.getElementById("sub_topic").value = config.sub_topic;
-  document.getElementById("geo_center").value =
-    GEOFENCE_CENTER[0] + ", " + GEOFENCE_CENTER[1];
-  document.getElementById("geo_radius").value = GEOFENCE_RADIUS;
-
-  connectMQTT(config);
-}
-
 function updateGeofence() {
   geofenceCircle.setLatLng(GEOFENCE_CENTER);
   geofenceCircle.setRadius(GEOFENCE_RADIUS);
@@ -220,7 +202,14 @@ function saveConfig() {
 
   updateGeofence();
 
-  const config = { broker, port, pub_topic, sub_topic };
+  const config = {
+    broker,
+    port,
+    pub_topic,
+    sub_topic,
+    geo_center: GEOFENCE_CENTER, // array [lat, lon]
+    geo_radius: GEOFENCE_RADIUS,
+  };
   localStorage.setItem("mqtt_config", JSON.stringify(config));
 
   Swal.fire({
@@ -344,11 +333,54 @@ function connectMQTT(config) {
 }
 
 // ================= INIT =================
-loadConfig();
-document.getElementById("geo_radius").addEventListener("input", function () {
-  let val = parseFloat(this.value);
-  if (!isNaN(val)) {
-    GEOFENCE_RADIUS = val;
-    updateGeofence();
+function loadConfig() {
+  let config = JSON.parse(localStorage.getItem("mqtt_config"));
+
+  if (!config) {
+    config = {
+      broker: "broker.emqx.io",
+      port: 8084,
+      pub_topic: "rizky/geo-alert",
+      sub_topic: "rizky/gps-data",
+      geo_center: [-5.1477, 119.4327],
+      geo_radius: 10000,
+    };
   }
-});
+
+  currentConfig = config;
+
+  // Restore geo_center dan geo_radius dari localStorage
+  if (config.geo_center) {
+    GEOFENCE_CENTER = config.geo_center;
+    if (tempMarker) map.removeLayer(tempMarker);
+    tempMarker = L.marker(GEOFENCE_CENTER, {
+      icon: geofenceIcon,
+    }).addTo(map);
+  }
+  if (config.geo_radius) {
+    GEOFENCE_RADIUS = config.geo_radius;
+  }
+
+  document.getElementById("broker").value = config.broker;
+  document.getElementById("port").value = config.port;
+  document.getElementById("pub_topic").value = config.pub_topic;
+  document.getElementById("sub_topic").value = config.sub_topic;
+  document.getElementById("geo_center").value =
+    GEOFENCE_CENTER[0] + ", " + GEOFENCE_CENTER[1];
+  document.getElementById("geo_radius").value = GEOFENCE_RADIUS;
+
+  // Restore state switch geofence dari localStorage
+  const savedSwitchState = localStorage.getItem("geofence_enabled");
+  if (savedSwitchState !== null) {
+    geofenceEnabled = savedSwitchState === "true";
+    geofenceSwitch.checked = geofenceEnabled;
+
+    if (geofenceEnabled) {
+      map.addLayer(geofenceCircle);
+    }
+  }
+
+  updateGeofence();
+  connectMQTT(config);
+}
+loadConfig();
